@@ -1,0 +1,26 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Log in to DockerHub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Docker Image
+      run: docker build -t car-damage-api .
+
+    - name: Tag Docker Image
+      run: docker tag car-damage-api:latest ${{ secrets.DOCKER_USERNAME }}/car-damage-api:latest
+
+    - name: Push Docker Image
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/car-damage-api:latest
